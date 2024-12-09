@@ -1,89 +1,73 @@
 import json
-import os
+import random
 
 
-def generate_word_json(word_file, topic_name="SCIENCE", output_file="Words/output.json"):
-    topic_name = topic_name.upper()
+def txt_to_json(file_path):
+    def filter_words(words, min_len, max_len):
+        return [word for word in words if min_len <= len(word) <= max_len]
 
-    with open(word_file, "r") as f:
-        words = [line.strip() for line in f if line.strip()]
+    with open(file_path, 'r') as file:
+        data = file.read()
 
-    word_pool = set(words)
-    used_words = set()
+    sections = data.split('====================')
+    result = {}
+    warnings = []
 
-    def get_unique_words(count, min_len, max_len, max_long_words=None):
-        nonlocal word_pool, used_words
-        selection = []
-        long_words_count = 0
-        available_words = list(word_pool - used_words)
+    for section in sections:
+        if section.strip():
+            lines = section.strip().splitlines()
+            topic = lines[0].strip('>').strip()
+            words = [word.strip() for word in lines[1:] if word.strip()]
 
-        for word in available_words:
-            if len(word) > max_len:
-                continue
-            if min_len <= len(word) <= max_len:
-                if max_long_words and len(word) > 8 and long_words_count >= max_long_words:
-                    continue
-                selection.append(word)
-                if len(word) > 8:
-                    long_words_count += 1
-                used_words.add(word)
-                if len(selection) == count:
-                    break
+            normal_words = filter_words(words, 4, 11)
+            hard_words = filter_words(words, 6, 15)
 
-        if len(selection) < count:
-            required = count - len(selection)
-            return selection, required
-        return selection, 0
+            topic_result = {"Normal": [], "Hard": [], "Bonus": {}}
 
-    data = {topic_name: {
-        "Normal": [],
-        "Hard": [],
-        "Bonus": {"Normal": [], "Hard": []}
-    }}
+            # Generate lists for Normal mode
+            for i in range(10):
+                if len(normal_words) >= 10:
+                    topic_result["Normal"].append(
+                        random.sample(normal_words, 10))
+                else:
+                    topic_result["Normal"].append(normal_words[:])
+                    warnings.append(f"Topic '{topic}' Normal mode, Puzzle number {
+                                    i+1} is lacking {10 - len(normal_words)} words.")
 
-    # Normal mode - 10 lists of 10 words each
-    for _ in range(10):
-        selection, needed = get_unique_words(10, 4, 11, max_long_words=3)
-        if needed:
-            print(f"Normal mode requires {needed} more unique words.")
-        data[topic_name]["Normal"].append(selection)
+            # Generate lists for Hard mode
+            for i in range(5):
+                if len(hard_words) >= 15:
+                    topic_result["Hard"].append(random.sample(hard_words, 15))
+                else:
+                    topic_result["Hard"].append(hard_words[:])
+                    warnings.append(f"Topic '{topic}' Hard mode, Puzzle number {
+                                    i+1} is lacking {15 - len(hard_words)} words.")
 
-    # Hard mode - 5 lists of 15 words each
-    for _ in range(5):
-        selection, needed = get_unique_words(15, 6, 15)
-        if needed:
-            print(f"Hard mode requires {needed} more unique words.")
-        data[topic_name]["Hard"].append(selection)
+            # Generate lists for Bonus mode
+            if len(normal_words) >= 10:
+                topic_result["Bonus"]["Normal"] = [
+                    random.sample(normal_words, 10)]
+            else:
+                topic_result["Bonus"]["Normal"] = [normal_words[:]]
+                warnings.append(f"Topic '{topic}' Bonus Normal mode is lacking {
+                                10 - len(normal_words)} words.")
 
-    # Bonus Normal (Normal) - 1 list of 10 words
-    bonus_normal, needed = get_unique_words(10, 4, 11, max_long_words=3)
-    if needed:
-        print(f"Bonus Normal requires {needed} more unique words.")
-    data[topic_name]["Bonus"]["Normal"].append(bonus_normal)
+            if len(hard_words) >= 15:
+                topic_result["Bonus"]["Hard"] = [random.sample(hard_words, 15)]
+            else:
+                topic_result["Bonus"]["Hard"] = [hard_words[:]]
+                warnings.append(f"Topic '{topic}' Bonus Hard mode is lacking {
+                                15 - len(hard_words)} words.")
 
-    # Bonus Hard (Hard) - 1 list of 15 words
-    bonus_hard, needed = get_unique_words(15, 6, 15)
-    if needed:
-        print(f"Bonus Hard requires {needed} more unique words.")
-    data[topic_name]["Bonus"]["Hard"].append(bonus_hard)
+            result[topic] = topic_result
 
-    # with open("Words/output.json", "w") as json_file:
-    #     json.dump(data, json_file, indent=2)
+    if warnings:
+        print("\nWarnings:")
+        for warning in warnings:
+            print(warning)
 
-    if os.path.exists(output_file):
-        with open(output_file, "r") as f:
-            existing_data = json.load(f)
-        
-        existing_data.update(data)
-        
-        with open(output_file, "w") as f:
-            json.dump(existing_data, f, indent=2)
-        print(f"Appended topic to {output_file}.")
-    else:
-        with open(output_file, "w") as f:
-            json.dump(data, f, indent=2)
-        print(f"Created new file {output_file} with initial data.")
+    with open("Words/words.json", "w") as f:
+        json.dump(result, f, indent=4)
 
 
-topic = input("Enter the topic name: ").title()
-generate_word_json(f"Words/{topic}.txt", topic_name=topic, output_file="Words/words.json")
+txt_to_json("Words/words.txt")

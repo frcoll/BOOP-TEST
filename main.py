@@ -17,13 +17,18 @@ def main():
 
     print(f"Creating book '{book_name}'.\n\n")
 
-    start_puzzle = input(
-        "Enter the puzzle number to start from (default 1): ") or "1"
+    start_puzzle = input("Enter the puzzle number to start from (default 1): ") or "1"
     if not start_puzzle.isdigit():
         print("Invalid puzzle number. Exiting...")
         return
     else:
         start_puzzle = int(start_puzzle)
+
+    delete_puzzles = input("Delete puzzles after making the book? (y/n, default n): ").lower() or 'n'
+    if delete_puzzles not in ['y', 'n']:
+        print("Invalid input. Exiting...")
+        return
+
 
     if start_puzzle == 1:
         print("Adding cover image.\n")
@@ -48,6 +53,12 @@ def main():
                        background_image=puzzle_background_image)
 
     print("All puzzles added to the book.")
+
+    if delete_puzzles == 'y':
+        print("Deleting puzzles...")
+        import shutil
+        shutil.rmtree(puzzle_folder)
+        print("Puzzles deleted.")
 
     print(f"Book '{book_name}' created successfully.")
 
