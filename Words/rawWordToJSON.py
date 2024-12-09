@@ -2,7 +2,7 @@ import json
 import random
 
 
-def txt_to_json(file_path):
+def word_to_json(file_path="Words/words.txt"):
     def filter_words(words, min_len, max_len):
         return [word for word in words if min_len <= len(word) <= max_len]
 
@@ -70,4 +70,5 @@ def txt_to_json(file_path):
         json.dump(result, f, indent=4)
 
 
-txt_to_json("Words/words.txt")
+if __name__ == '__main__':
+    word_to_json("Words/words.txt")

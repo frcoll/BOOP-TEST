@@ -1,6 +1,7 @@
 from appendImage import append_page, append_puzzle_page
 from index import create_title_page
 from generatePuzzle import create_all_puzzles, create_individual_puzzle
+from Words.rawWordToJSON import word_to_json
 
 # Global book_name
 book_name = "Where's Word-o"
@@ -37,6 +38,9 @@ def main():
         print("Creating title page.\n")
         create_title_page(book_name, word_json_path,
                           background_image=background_image)
+
+    print("Converting raw words to JSON.\n")
+    word_to_json(file_path="Words/words.txt")
 
     print("\nGenerating puzzles and adding to the book.")
     fail_count = create_all_puzzles(
