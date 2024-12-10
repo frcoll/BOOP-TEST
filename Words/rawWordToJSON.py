@@ -1,3 +1,4 @@
+import os
 import json
 import random
 
@@ -6,8 +7,12 @@ def word_to_json(file_path="Words/words.txt"):
     def filter_words(words, min_len, max_len):
         return [word for word in words if min_len <= len(word) <= max_len]
 
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"Error: File '{file_path}' does not exist.")
+
     with open(file_path, 'r') as file:
         data = file.read()
+
 
     sections = data.split('====================')
     result = {}
@@ -63,8 +68,7 @@ def word_to_json(file_path="Words/words.txt"):
 
     if warnings:
         print("\nWarnings:")
-        for warning in warnings:
-            print(warning)
+        print("\n".join(warnings))
 
     with open("Words/words.json", "w") as f:
         json.dump(result, f, indent=4)

@@ -18,14 +18,13 @@ def main():
 
     print(f"Creating book '{book_name}'.\n\n")
 
-    start_puzzle = input("Enter the puzzle number to start from (default 1): ") or "1"
+    start_puzzle = input("Enter the puzzle number to start from (default 1): ").strip() or "1"
     if not start_puzzle.isdigit():
         print("Invalid puzzle number. Exiting...")
         return
-    else:
-        start_puzzle = int(start_puzzle)
+    start_puzzle = int(start_puzzle)
 
-    delete_puzzles = input("Delete puzzles after making the book? (y/n, default n): ").lower() or 'n'
+    delete_puzzles = input("Delete puzzles after making the book? (y/n, default n): ").strip().lower() or 'n'
     if delete_puzzles not in ['y', 'n']:
         print("Invalid input. Exiting...")
         return
@@ -47,7 +46,7 @@ def main():
         word_json_path, puzzle_background_image, puzzle_folder, start_puzzle)
 
     if fail_count:
-        print(f"Failed to create {fail_count} puzzles.")
+        print(f"Failed to create {fail_count} puzzle(s).")
         create_individual_puzzle(
             fail_count, word_json_path, puzzle_folder, background_image=puzzle_background_image)
 

@@ -623,5 +623,8 @@ def main():
 if __name__ == '__main__':
     # main()
     # append_solutions_page("Test.pdf", "generated_puzzles", "Assets/Background.png")
-    append_puzzle_page("Test.pdf", "generated_puzzles",
-                       "Assets/pageBackground.png")
+    append_puzzle_page(
+        "Test.pdf", 
+        "generated_puzzles", 
+        "Assets/pageBackground.png"
+    )

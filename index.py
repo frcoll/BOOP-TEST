@@ -7,8 +7,7 @@ from PyPDF2 import PdfReader, PdfWriter
 class PDF(FPDF):
     def __init__(self, pdf_file, background_image=None):
         super().__init__()
-        self.pdf_file = pdf_file if pdf_file.endswith(".pdf") else f"{
-            pdf_file}.pdf"
+        self.pdf_file = pdf_file if pdf_file.endswith(".pdf") else f"{pdf_file}.pdf"
         self.background_image = background_image
 
     def add_page(self, *args, **kwargs):
@@ -24,12 +23,12 @@ class PDF(FPDF):
             reader = PdfReader(self.pdf_file)
             writer = PdfWriter()
 
-            for page in range(len(reader.pages)):
-                writer.add_page(reader.pages[page])
+            for page in reader.pages:
+                writer.add_page(page)
 
             new_reader = PdfReader(new_pdf_path)
-            for page in range(len(new_reader.pages)):
-                writer.add_page(new_reader.pages[page])
+            for page in new_reader.pages:
+                writer.add_page(page)
 
             with open(self.pdf_file, "wb") as f:
                 writer.write(f)
@@ -47,6 +46,10 @@ def create_title_page(pdf_file, words_json, background_image=None):
     pdf.set_font("Arial", "B", 32)
     pdf.cell(200, 20, txt=book_title, ln=True, align="C")
     pdf.ln(10)
+
+    if not os.path.exists(words_json):
+        print(f"Error: File '{words_json}' does not exist.")
+        return
 
     with open(words_json, 'r') as f:
         data = json.load(f)
@@ -99,8 +102,11 @@ def create_title_page(pdf_file, words_json, background_image=None):
 
 
 def main():
-    create_title_page("Where's Word-o", "Words/words.json",
-                      background_image="Assets/Background.png")
+    create_title_page(
+        pdf_file="Where's Word-o",
+        words_json="Words/words.json",
+        background_image="Assets/Background.png"
+    )
 
 
 if __name__ == '__main__':
